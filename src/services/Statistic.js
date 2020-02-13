@@ -37,8 +37,8 @@ const makeAverageBlockInfo = blockList => {
         return { error: 'Failed to make average block info' }
     let averageBlockInfo = {};
     const difficultyList = blockList.map(_ => _.difficulty);
-    const maxDifficulty = difficultyList.max();
-    const minDifficulty = difficultyList.min();
+    const maxDifficulty = Math.max.apply(null, difficultyList);
+    const minDifficulty = Math.min.apply(null, difficultyList);
     blockList.forEach((blockInfo) => 
         averageBlockInfo = {
             height: blockInfo.height,
