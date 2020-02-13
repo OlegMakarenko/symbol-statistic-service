@@ -3,6 +3,7 @@ const config = require('../config.json');
 const DBService = require('./DBService.js');
 const periodDuration = config.periodDuration;
 const numberOfPeriods = config.numberOfPeriods;
+const blockGenerationTargetTime = config.blockGenerationTargetTime;
 
 
 class Statistic {
@@ -18,19 +19,28 @@ class Statistic {
 
     fetchNewSetOfBlocks = async blockHeight => {
         try {
-            const blockList = await http.getBlocksFromHeightWithLimit(periodDuration, blockHeight);
+            let blocksCountToFetch = Math.round(periodDuration / blockGenerationTargetTime);
+
+            if(this.blockDataSet && this.blockDataSet[this.blockDataSet.length - 1])
+                blocksCountToFetch = blockHeight - this.blockDataSet[this.blockDataSet.length - 1].height;
+
+            const blockList = await http.getBlocksFromHeightWithLimit(blocksCountToFetch, blockHeight);
+
             if(blockList) {
-                const averageBlockInfo = makeAverageBlockInfo(blockList)
+                const averageBlockInfo = makeAverageBlockInfo(blockList);
+
                 if( 
                     this.blockDataSet &&
                     this.blockDataSet[this.blockDataSet.length - 1] &&
                     averageBlockInfo.timestamp - this.blockDataSet[this.blockDataSet.length - 1].timestamp < periodDuration
                 )
                     return 0;
+
                 this.blockDataSet.push(averageBlockInfo);
                 if(this.blockDataSet.length > numberOfPeriods)
                     this.blockDataSet.shift();
                 DBService.saveDataSet(this.blockDataSet);
+                
                 console.log('Added new data-set', this.blockDataSet, this.blockDataSet.length);
             }
         }
@@ -62,6 +72,7 @@ const makeAverageBlockInfo = blockList => {
     })
 
     return {
+        blocksParsed: blockList.length,
         height: averageBlockInfo.height,
         timestamp: averageBlockInfo.timestamp,
         totalFee: averageBlockInfo.totalFee,
@@ -72,7 +83,8 @@ const makeAverageBlockInfo = blockList => {
         feeMultiplier: averageBlockInfo.feeMultiplier,
         avgFeeMultiplier: averageBlockInfo.feeMultiplier / blockList.length,
         numTransactions: averageBlockInfo.numTransactions,
-        avgNumTransaction:  averageBlockInfo.numTransactions / blockList.length
+        avgNumTransaction:  averageBlockInfo.numTransactions / blockList.length,
+
     }
 }
  
