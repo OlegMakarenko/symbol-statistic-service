@@ -3,20 +3,29 @@ const config = require('../config.json');
 const periodDuration = config.periodDuration;
 const numberOfPeriods = config.numberOfPeriods;
 
-var blockDataSet = [];
 
-const fetchNewSetOfBlocks = async blockHeight => {
-    const blockList = await http.getBlocksFromHeightWithLimit(periodDuration, blockHeight);
-    if(blockList) {
-        
-        const averageBlockInfo = makeAverageBlockInfo(blockList)
-        
-        blockDataSet.push(averageBlockInfo);
-        if(blockDataSet.length > numberOfPeriods)
-            blockDataSet.shift();
-        console.log(blockDataSet, blockDataSet.length);
+class Statistic {
+    constructor() {
+        this.blockDataSet = [];
     }
+
+    fetchNewSetOfBlocks = async blockHeight => {
+        const blockList = await http.getBlocksFromHeightWithLimit(periodDuration, blockHeight);
+        if(blockList) {
+            
+            const averageBlockInfo = makeAverageBlockInfo(blockList)
+            
+            this.blockDataSet.push(averageBlockInfo);
+            if(this.blockDataSet.length > numberOfPeriods)
+                this.blockDataSet.shift();
+            console.log(this.blockDataSet, this.blockDataSet.length);
+        }
+    }
+
+    getAllStatistics = () => [ ...this.blockDataSet ]
 }
+
+
 
 const makeAverageBlockInfo = blockList => {
     let averageBlockInfo = {};
@@ -41,6 +50,4 @@ const makeAverageBlockInfo = blockList => {
 }
  
 
-module.exports = {
-    fetchNewSetOfBlocks
-}
+module.exports = new Statistic();
