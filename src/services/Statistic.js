@@ -42,10 +42,13 @@ const makeAverageBlockInfo = blockList => {
     return {
         height: averageBlockInfo.height,
         timestamp: averageBlockInfo.timestamp,
-        totalFee: averageBlockInfo.totalFee / blockList.length,
-        difficulty: averageBlockInfo.difficulty / blockList.length,
-        feeMultiplier: averageBlockInfo.feeMultiplier / blockList.length,
-        numTransactions: averageBlockInfo.numTransactions / blockList.length
+        totalFee: averageBlockInfo.totalFee,
+        avgTotalFee: averageBlockInfo.totalFee / blockList.length,
+        avgDifficulty: averageBlockInfo.difficulty / blockList.length,
+        feeMultiplier: averageBlockInfo.feeMultiplier,
+        avgFeeMultiplier: averageBlockInfo.feeMultiplier / blockList.length,
+        numTransactions: averageBlockInfo.numTransactions,
+        avgNumTransactionPerBlock:  averageBlockInfo.numTransactions / blockList.length
     }
 }
  
