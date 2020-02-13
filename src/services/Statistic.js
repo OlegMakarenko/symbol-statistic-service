@@ -10,15 +10,20 @@ class Statistic {
     }
 
     fetchNewSetOfBlocks = async blockHeight => {
-        const blockList = await http.getBlocksFromHeightWithLimit(periodDuration, blockHeight);
-        if(blockList) {
-            
-            const averageBlockInfo = makeAverageBlockInfo(blockList)
-            
-            this.blockDataSet.push(averageBlockInfo);
-            if(this.blockDataSet.length > numberOfPeriods)
-                this.blockDataSet.shift();
-            console.log(this.blockDataSet, this.blockDataSet.length);
+        try {
+            const blockList = await http.getBlocksFromHeightWithLimit(periodDuration, blockHeight);
+            if(blockList) {
+                
+                const averageBlockInfo = makeAverageBlockInfo(blockList)
+                
+                this.blockDataSet.push(averageBlockInfo);
+                if(this.blockDataSet.length > numberOfPeriods)
+                    this.blockDataSet.shift();
+                console.log(this.blockDataSet, this.blockDataSet.length);
+            }
+        }
+        catch(e) {
+            console.log('Failed to fetch blockInfo list')
         }
     }
 
@@ -28,7 +33,12 @@ class Statistic {
 
 
 const makeAverageBlockInfo = blockList => {
+    if(typeof blockList !== 'object')
+        return { error: 'Failed to make average block info' }
     let averageBlockInfo = {};
+    const difficultyList = blockList.map(_ => _.difficulty);
+    const maxDifficulty = difficultyList.max();
+    const minDifficulty = difficultyList.min();
     blockList.forEach((blockInfo) => 
         averageBlockInfo = {
             height: blockInfo.height,
@@ -45,10 +55,12 @@ const makeAverageBlockInfo = blockList => {
         totalFee: averageBlockInfo.totalFee,
         avgTotalFee: averageBlockInfo.totalFee / blockList.length,
         avgDifficulty: averageBlockInfo.difficulty / blockList.length,
+        maxDifficulty,
+        minDifficulty,
         feeMultiplier: averageBlockInfo.feeMultiplier,
         avgFeeMultiplier: averageBlockInfo.feeMultiplier / blockList.length,
         numTransactions: averageBlockInfo.numTransactions,
-        avgNumTransactionPerBlock:  averageBlockInfo.numTransactions / blockList.length
+        avgNumTransaction:  averageBlockInfo.numTransactions / blockList.length
     }
 }
  
