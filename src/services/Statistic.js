@@ -1,29 +1,41 @@
 const http = require('./Http')
 const config = require('../config.json');
+const DBService = require('./DBService.js');
 const periodDuration = config.periodDuration;
 const numberOfPeriods = config.numberOfPeriods;
 
 
 class Statistic {
     constructor() {
-        this.blockDataSet = [];
+        DBService.getDataSet()
+            .then(data => {
+                this.blockDataSet = data;
+                console.log('Current data-set', this.blockDataSet);
+            })
+            .catch(err => {console.error(err); this.blockDataSet = []});
+        
     }
 
     fetchNewSetOfBlocks = async blockHeight => {
         try {
             const blockList = await http.getBlocksFromHeightWithLimit(periodDuration, blockHeight);
             if(blockList) {
-                
                 const averageBlockInfo = makeAverageBlockInfo(blockList)
-                
+                if( 
+                    this.blockDataSet &&
+                    this.blockDataSet[this.blockDataSet.length - 1] &&
+                    averageBlockInfo.timestamp - this.blockDataSet[this.blockDataSet.length - 1].timestamp < periodDuration
+                )
+                    return 0;
                 this.blockDataSet.push(averageBlockInfo);
                 if(this.blockDataSet.length > numberOfPeriods)
                     this.blockDataSet.shift();
-                console.log(this.blockDataSet, this.blockDataSet.length);
+                DBService.saveDataSet(this.blockDataSet);
+                console.log('Added new data-set', this.blockDataSet, this.blockDataSet.length);
             }
         }
         catch(e) {
-            console.log('Failed to fetch blockInfo list')
+            console.log('Failed to fetch blockInfo list', e)
         }
     }
 
