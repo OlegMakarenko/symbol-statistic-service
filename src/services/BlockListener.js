@@ -32,7 +32,7 @@ class BlockListener {
                     console.log(err);
                 });
         }
-        else console.log('Period', currentBlockTimestamp - statistic.lastPeriodTimestamp, 'expected', periodDuration)
+       
     }
 
     close() {
