@@ -24,11 +24,15 @@ class BlockListener {
 
     onBlockNewReceived(block) {
         const currentBlockTimestamp = format.formatTimestamp(block.timestamp.compact());
-        if(currentBlockTimestamp - lastRecoredBlockTimestamp >= periodDuration){
-            lastRecoredBlockTimestamp = currentBlockTimestamp; 
-            console.log(currentBlockTimestamp)
+        if(currentBlockTimestamp - statistic.lastPeriodTimestamp > periodDuration){
+            console.log('Listener received block #', block.height.compact(), 'from the new period',)
             statistic.fetchNewSetOfBlocks(block.height.compact())
+                .then(() => {})
+                .catch(err => {
+                    console.log(err);
+                });
         }
+        else console.log('Period', currentBlockTimestamp - statistic.lastPeriodTimestamp, 'expected', periodDuration)
     }
 
     close() {

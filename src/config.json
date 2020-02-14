@@ -2,6 +2,6 @@
     "port": 2001,
     "nodeUrl": "http://api-xym-3-01.us-west-2.nemtech.network:3000",
     "blockGenerationTargetTime": 15,
-    "periodDuration": 3600,
-    "numberOfPeriods": 24
+    "periodDuration": 1800,
+    "numberOfPeriods": 42
 }

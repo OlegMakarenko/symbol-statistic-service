@@ -17,12 +17,24 @@ class Statistic {
         
     }
 
+    get lastPeriodTimestamp() {
+        if( 
+            this.blockDataSet &&
+            this.blockDataSet[this.blockDataSet.length - 1] &&
+            this.blockDataSet[this.blockDataSet.length - 1].timestamp
+        )
+        return this.blockDataSet[this.blockDataSet.length - 1].timestamp;
+        else return 0;
+    }
+
     fetchNewSetOfBlocks = async blockHeight => {
-        try {
+       /// try {
             let blocksCountToFetch = Math.round(periodDuration / blockGenerationTargetTime);
 
             if(this.blockDataSet && this.blockDataSet[this.blockDataSet.length - 1]){
                 blocksCountToFetch = blockHeight - this.blockDataSet[this.blockDataSet.length - 1].height;
+                console.log(blockHeight - this.blockDataSet[this.blockDataSet.length - 1].height,
+                    blockHeight, this.blockDataSet[this.blockDataSet.length - 1].height)
             }
 
             const blockList = await http.getBlocksFromHeightWithLimit(blocksCountToFetch, blockHeight);
@@ -30,13 +42,20 @@ class Statistic {
             if(blockList) {
                 const averageBlockInfo = makeAverageBlockInfo(blockList);
                 console.log('Statistics received data-set of ', blockList.length + ' elements')
-
+                console.log()
                 if( 
                     this.blockDataSet &&
                     this.blockDataSet[this.blockDataSet.length - 1] &&
                     averageBlockInfo.timestamp - this.blockDataSet[this.blockDataSet.length - 1].timestamp < periodDuration
-                )
-                    return 0;
+                ){
+                    throw Error(
+                        '>>Inavlid period' + 
+                        ' | current time_s: ' + averageBlockInfo.timestamp +
+                        ' | last time_s: ' + this.blockDataSet[this.blockDataSet.length - 1].timestamp +
+                        ' | expected-period: ' + periodDuration +
+                        ' | current-period: ' + (averageBlockInfo.timestamp - this.blockDataSet[this.blockDataSet.length - 1].timestamp)
+                    );
+                }
 
                 this.blockDataSet.push(averageBlockInfo);
                 if(this.blockDataSet.length > numberOfPeriods)
@@ -44,11 +63,12 @@ class Statistic {
                 DBService.saveDataSet(this.blockDataSet);
 
                 console.log('Added new data-set', averageBlockInfo.height, this.blockDataSet.length);
+                return Promise.resolve();
             }
-        }
-        catch(e) {
-            console.log('Failed to create data set', e)
-        }
+        //}
+        //catch(e) {
+        //    throw Error('Failed to create data set', e)
+        //}
     }
 
     getAllStatistics = () => [ ...this.blockDataSet ]
@@ -59,6 +79,8 @@ class Statistic {
 const makeAverageBlockInfo = blockList => {
     if(typeof blockList !== 'object')
         return { error: 'Failed to make average block info' }
+
+
     let averageBlockInfo = {};
     const difficultyList = blockList.map(_ => _.difficulty);
     const maxDifficulty = Math.max.apply(null, difficultyList);
@@ -75,8 +97,8 @@ const makeAverageBlockInfo = blockList => {
 
     return {
         blocksParsed: blockList.length,
-        height: averageBlockInfo.height,
-        timestamp: averageBlockInfo.timestamp,
+        height:blockList[0] ? blockList[0].height : 0,
+        timestamp: blockList[0] ? blockList[0].timestamp : 0,
         totalFee: averageBlockInfo.totalFee,
         avgTotalFee: averageBlockInfo.totalFee / blockList.length,
         avgDifficulty: averageBlockInfo.difficulty / blockList.length,
@@ -85,8 +107,7 @@ const makeAverageBlockInfo = blockList => {
         feeMultiplier: averageBlockInfo.feeMultiplier,
         avgFeeMultiplier: averageBlockInfo.feeMultiplier / blockList.length,
         numTransactions: averageBlockInfo.numTransactions,
-        avgNumTransaction:  averageBlockInfo.numTransactions / blockList.length,
-
+        avgNumTransaction:  averageBlockInfo.numTransactions / blockList.length
     }
 }
  

@@ -14,7 +14,7 @@ class Infrastructure {
     }
 
     getBlocksFromHeightWithLimit = async (limit, fromBlockHeight) => {
-        console.log('Get block info from height:' + fromBlockHeight + 'with limit: ' + limit);
+        console.log('Get block info from height:' + fromBlockHeight + ' with limit: ' + limit);
 
         if(!limit || limit === 0)
             limit = 100;
