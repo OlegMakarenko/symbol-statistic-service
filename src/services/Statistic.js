@@ -11,7 +11,7 @@ class Statistic {
         DBService.getDataSet()
             .then(data => {
                 this.blockDataSet = data;
-                console.log('Current data-set', this.blockDataSet);
+                console.log('Current data-set', this.blockDataSet.length);
             })
             .catch(err => {console.error(err); this.blockDataSet = []});
         
@@ -21,13 +21,15 @@ class Statistic {
         try {
             let blocksCountToFetch = Math.round(periodDuration / blockGenerationTargetTime);
 
-            if(this.blockDataSet && this.blockDataSet[this.blockDataSet.length - 1])
+            if(this.blockDataSet && this.blockDataSet[this.blockDataSet.length - 1]){
                 blocksCountToFetch = blockHeight - this.blockDataSet[this.blockDataSet.length - 1].height;
+            }
 
             const blockList = await http.getBlocksFromHeightWithLimit(blocksCountToFetch, blockHeight);
 
             if(blockList) {
                 const averageBlockInfo = makeAverageBlockInfo(blockList);
+                console.log('Statistics received data-set of ', blockList.length + ' elements')
 
                 if( 
                     this.blockDataSet &&
@@ -40,12 +42,12 @@ class Statistic {
                 if(this.blockDataSet.length > numberOfPeriods)
                     this.blockDataSet.shift();
                 DBService.saveDataSet(this.blockDataSet);
-                
-                console.log('Added new data-set', this.blockDataSet, this.blockDataSet.length);
+
+                console.log('Added new data-set', averageBlockInfo.height, this.blockDataSet.length);
             }
         }
         catch(e) {
-            console.log('Failed to fetch blockInfo list', e)
+            console.log('Failed to create data set', e)
         }
     }
 
