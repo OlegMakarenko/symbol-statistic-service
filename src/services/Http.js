@@ -1,6 +1,6 @@
 const axios = require('axios')
 const config = require('../config.json')
-const sdk = require('nem2-sdk')
+const sdk = require('symbol-sdk')
 const format = require('../format')
 const nodeUrl = config.nodeUrl
 
@@ -25,7 +25,7 @@ class Infrastructure {
         if(blocksDataPage)
           blocksData = [ ...blocksData, ...blocksDataPage]
       }
-        
+
       return blocksData.slice(0, limit - 1)
     }
 
@@ -36,7 +36,7 @@ class Infrastructure {
         blockHeight = 'latest'
       else
         blockHeight = fromBlockHeight.toString()
-    
+
       const path = `/blocks/from/${blockHeight}/limit/100`
       const response = await axios.get(nodeUrl + path)
         .catch(err => { throw Error('Failed to get blocks', err) })

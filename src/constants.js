@@ -12,7 +12,7 @@ const {
   ResolutionType,
   RoleType,
   Deadline
-} = require('nem2-sdk')
+} = require('symbol-sdk')
 
 class Constants {
     static PageSize = 25

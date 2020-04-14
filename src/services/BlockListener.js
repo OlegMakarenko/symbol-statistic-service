@@ -1,6 +1,6 @@
 const http = require('./Http')
 const config = require('../config.json')
-const sdk = require('nem2-sdk')
+const sdk = require('symbol-sdk')
 const format = require('../format')
 const statistic = require('./Statistic')
 const periodDuration = config.periodDuration
@@ -10,13 +10,13 @@ let lastRecoredBlockTimestamp = 1
 class BlockListener {
   constructor() {
     this.listener = http.listener
-    
+
     this.listener.open()
-      .then(() => 
+      .then(() =>
         this.listener
           .newBlock()
           .subscribe(
-            block => this.onBlockNewReceived(block), 
+            block => this.onBlockNewReceived(block),
             err => console.error(err)
           )
       )
@@ -32,7 +32,7 @@ class BlockListener {
           console.log(err)
         })
     }
-       
+
   }
 
   close() {
