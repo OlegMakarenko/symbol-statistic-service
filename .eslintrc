@@ -1,0 +1,24 @@
+{
+  "env": {
+      "node": true,
+      "es6": true
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+      "parser": "babel-eslint",
+      "ecmaVersion": 6,
+      "sourceType": "module"
+  },
+  "rules": {
+      "comma-dangle": ["error", "never"],
+      "no-control-regex": "off",
+      "no-empty": ["error", {
+          "allowEmptyCatch": true
+      }],
+      "curly": ["error", "multi-or-nest"],
+      "semi": ["error", "never"],
+      "indent": ["error", 2],
+      "no-var": "error",
+      "no-multiple-empty-lines" : ["error", {"max": 1}]
+  }
+}
