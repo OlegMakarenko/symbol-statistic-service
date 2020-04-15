@@ -32,7 +32,7 @@
     "express": "^4.14.0",
     "express-ws": "^4.0.0",
     "mongodb": "^2.2.16",
-    "mongoose": "^5.5.8",
+    "mongoose": "^5.7.5",
     "symbol-data-lib": "file:symbol-data-lib",
     "symbol-sdk": "^0.17.4",
     "websocket": "^1.0.28"
