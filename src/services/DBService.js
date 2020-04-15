@@ -1,8 +1,8 @@
 // TODO: add Mongo
-const fs = require('fs');
+const fs = require('fs')
 
 const saveDataSet = dataSet => {
-    fs.writeFileSync('data-set.json', JSON.stringify(dataSet));
+    fs.writeFileSync('data-set.json', JSON.stringify(dataSet))
 }
 
 const getDataSet = () => {
@@ -10,15 +10,15 @@ const getDataSet = () => {
         fs.readFile('data-set.json', (err, data) => {
             if (err) reject(err)
             try {
-                const json = JSON.parse(data);
-                resolve(json);
+                const json = JSON.parse(data)
+                resolve(json)
             }
             catch(err) {
-                reject(err);
+                reject(err)
             }
-        });
-    });
-    
+        })
+    })
+
 }
 
 module.exports = {
