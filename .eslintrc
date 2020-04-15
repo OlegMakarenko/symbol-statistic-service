@@ -16,8 +16,7 @@
           "allowEmptyCatch": true
       }],
       "curly": ["error", "multi-or-nest"],
-      "semi": ["error", "never"],
-      "indent": ["error", 2],
+      "indent": ["error", 4],
       "no-var": "error",
       "no-multiple-empty-lines" : ["error", {"max": 1}]
   }
